@@ -90,24 +90,14 @@ export default function CinematicWeddingMaster({
   onOpenEditor,
   onOpenExport,
 }) {
-  const [currentTime, setCurrentTime] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'details' || params.get('skip') === 'true') {
-        return 25.5;
-      }
-    }
-    return 0;
-  });
-  const [isPlaying, setIsPlaying] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'details' || params.get('skip') === 'true') {
-        return false;
-      }
-    }
-    return true;
-  });
+  const isSkipOrDetails = typeof window !== 'undefined' && (() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') === 'details' || params.get('skip') === 'true';
+  })();
+
+  const [currentTime, setCurrentTime] = useState(isSkipOrDetails ? 25.5 : 0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStarted, setHasStarted] = useState(isSkipOrDetails);
   const [isMuted, setIsMuted] = useState(false);
   const [isAudioActive, setIsAudioActive] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -145,6 +135,20 @@ export default function CinematicWeddingMaster({
     };
   }, [isPlaying]);
 
+  // Handle start experience with sound
+  const handleStartWithAudio = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.muted = false;
+      audio.play().then(() => {
+        setIsAudioActive(true);
+      }).catch(() => {});
+    }
+    setIsMuted(false);
+    setIsPlaying(true);
+    setHasStarted(true);
+  };
+
   // Automatic Audio Lifecycle & Global User Gesture Unlock
   useEffect(() => {
     const audio = audioRef.current;
@@ -156,22 +160,30 @@ export default function CinematicWeddingMaster({
     audio.play().then(() => {
       setIsMuted(false);
       setIsAudioActive(true);
+      setIsPlaying(true);
+      setHasStarted(true);
     }).catch(() => {
-      // Browser requires first user touch/click gesture
+      // Browser autoplay policy requires user interaction before audio starts
       setIsAudioActive(false);
     });
 
-    // 2. Global interaction handler: start audio automatically on first touch or click
+    // 2. Global interaction handler: start audio + film on ANY user gesture anywhere on screen
     const handleGesture = () => {
-      if (audio && audio.paused && !isMuted) {
+      if (audio && !isMuted) {
         audio.muted = false;
-        audio.play().then(() => {
+        if (audio.paused) {
+          audio.play().then(() => {
+            setIsAudioActive(true);
+          }).catch(() => {});
+        } else {
           setIsAudioActive(true);
-        }).catch(() => {});
+        }
       }
+      setIsPlaying(true);
+      setHasStarted(true);
     };
 
-    const events = ['click', 'touchstart', 'touchend', 'pointerdown'];
+    const events = ['click', 'touchstart', 'touchend', 'pointerdown', 'keydown'];
     events.forEach((evt) => {
       window.addEventListener(evt, handleGesture, { passive: true, capture: true });
     });
@@ -188,7 +200,10 @@ export default function CinematicWeddingMaster({
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (currentTime < TOTAL_DURATION && isPlaying) {
+    if (currentTime < TOTAL_DURATION && isPlaying && !isMuted) {
+      if (audio.paused && isAudioActive) {
+        audio.play().catch(() => {});
+      }
       if (audio.duration && !isNaN(audio.duration)) {
         const target = currentTime % audio.duration;
         if (Math.abs(audio.currentTime - target) > 0.8) {
@@ -196,18 +211,7 @@ export default function CinematicWeddingMaster({
         }
       }
     }
-  }, [isPlaying, currentTime]);
-
-  // Unlock audio on direct container tap
-  const handleUserInteraction = () => {
-    const audio = audioRef.current;
-    if (audio && audio.paused && !isMuted) {
-      audio.muted = false;
-      audio.play().then(() => {
-        setIsAudioActive(true);
-      }).catch(() => {});
-    }
-  };
+  }, [isPlaying, currentTime, isMuted, isAudioActive]);
 
   const togglePlay = () => {
     setIsPlaying((p) => {
@@ -227,12 +231,13 @@ export default function CinematicWeddingMaster({
   const handleReplay = () => {
     setCurrentTime(0);
     setIsPlaying(true);
+    setHasStarted(true);
     setIsMuted(false);
     const audio = audioRef.current;
     if (audio) {
       audio.currentTime = 0;
       audio.muted = false;
-      audio.play().catch(() => {});
+      audio.play().then(() => setIsAudioActive(true)).catch(() => {});
     }
   };
 
@@ -241,19 +246,18 @@ export default function CinematicWeddingMaster({
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (audio.paused || isMuted || !isAudioActive) {
-      // ONE CLICK: If audio is paused or muted, play and unmute IMMEDIATELY!
+    if (isMuted) {
+      // Currently muted -> Unmute & Play
       setIsMuted(false);
       audio.muted = false;
       audio.play().then(() => {
         setIsAudioActive(true);
       }).catch(() => {});
     } else {
-      // If currently playing, mute and pause
+      // Currently playing/unmuted -> Mute & Pause
       setIsMuted(true);
       audio.muted = true;
       audio.pause();
-      setIsAudioActive(false);
     }
   };
 
@@ -572,7 +576,7 @@ export default function CinematicWeddingMaster({
 
   return (
     <div
-      onClick={handleUserInteraction}
+      onClick={handleStartWithAudio}
       className="relative min-h-svh w-screen overflow-hidden bg-[#0A0403] text-[#FFF8E7] flex flex-col items-center justify-center font-sans"
     >
       {/* Background Ambient Glow */}
@@ -591,8 +595,14 @@ export default function CinematicWeddingMaster({
         preload="auto"
         loop
         playsInline
-        onPlay={() => setIsAudioActive(true)}
-        onPause={() => setIsAudioActive(false)}
+        autoPlay
+        onPlay={() => {
+          setIsAudioActive(true);
+          setIsMuted(false);
+        }}
+        onPause={() => {
+          if (isMuted) setIsAudioActive(false);
+        }}
       />
 
       {/* ========================================================================= */}
@@ -1113,7 +1123,7 @@ export default function CinematicWeddingMaster({
           <LongScrollableInvitationWebsite
             config={config}
             onReplay={handleReplay}
-            isMuted={!isAudioActive || isMuted}
+            isMuted={isMuted}
             audioUnlocked={isAudioActive}
             onToggleMute={toggleMute}
           />
@@ -1128,6 +1138,31 @@ export default function CinematicWeddingMaster({
           </div>
         )}
 
+        {/* Ceremonial Tap to Open Overlay (When initial audio autoplay is deferred by browser) */}
+        {!hasStarted && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              handleStartWithAudio();
+            }}
+            className="absolute inset-0 z-45 flex flex-col items-center justify-end pb-12 sm:pb-16 px-6 text-center cursor-pointer pointer-events-auto bg-gradient-to-t from-[#0A1F13]/70 via-transparent to-transparent"
+          >
+            <motion.div
+              animate={{ scale: [1, 1.05, 1], y: [0, -3, 0] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-[#18462B] via-[#215E39] to-[#18462B] border border-[#F5D98A] text-[#FFF8E7] shadow-[0_10px_35px_rgba(0,0,0,0.65)] flex items-center gap-3 cursor-pointer"
+            >
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FFEAA7] animate-ping" />
+              <span className="font-serif font-bold text-xs sm:text-sm tracking-[0.2em] uppercase text-[#FFFDF8]">
+                ✦ திருமண அழைப்பிதழ் • Tap to Open ✦
+              </span>
+              <Volume2 className="w-4 h-4 text-[#F5D98A]" />
+            </motion.div>
+            <p className="font-tamil text-xs text-[#13371F] bg-white/75 backdrop-blur-sm px-3.5 py-1 rounded-full drop-shadow mt-2.5 font-bold tracking-wide">
+              இன்னிசையுடன் கூடிய அழைப்பிதழ் • Tap Anywhere to Play with Music
+            </p>
+          </div>
+        )}
 
         {/* Floating Top Controls (Active only during the introductory film) */}
         {t < 24.4 && (
@@ -1138,13 +1173,13 @@ export default function CinematicWeddingMaster({
                 e.stopPropagation();
                 toggleMute();
               }}
-              aria-label={isAudioActive && !isMuted ? 'Mute music' : 'Unmute music'}
+              aria-label={isMuted ? 'Unmute music' : 'Mute music'}
               className="pointer-events-auto p-2 rounded-full bg-black/75 backdrop-blur-md border border-[#E6C687]/50 text-[#F5D98A] hover:bg-black/90 transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
             >
-              {isAudioActive && !isMuted ? (
-                <Volume2 className="w-4 h-4 text-[#F5D98A]" />
-              ) : (
+              {isMuted ? (
                 <VolumeX className="w-4 h-4 text-red-400" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-[#F5D98A]" />
               )}
             </button>
           </div>
