@@ -475,51 +475,53 @@ export default function CinematicWeddingMaster({
   let doorLightOpacity = 0; // 0 to 1
   let coupleElementsOpacity = 1;
 
-  if (t >= 17.8 && t < 19.5) {
-    // Phase 1a: Background fades in with subtle camera drift
-    const prog = (t - 17.8) / 1.7;
+  if (t >= 17.8 && t < 18.5) {
+    // Phase 1: Background fades in with subtle camera drift
+    const prog = (t - 17.8) / 0.7;
     coupleSceneOpacity = prog;
     backgroundScale = 1.04 - prog * 0.04; // 1.04 -> 1.0
-    coupleElementsOpacity = Math.max(0, (t - 18.2) / 1.3);
+    coupleElementsOpacity = 0; // Top date/monogram hidden!
     coupleCutoutOpacity = 0;
     coupleCutoutY = 45;
     coupleCutoutScale = 0.96;
     coupleScale = 1.0;
     doorAngle = 0;
     doorLightOpacity = 0;
-  } else if (t >= 19.5 && t < 20.2) {
-    // Phase 1b: Pure background & date badge view
-    coupleSceneOpacity = 1;
-    backgroundScale = 1.0;
-    coupleElementsOpacity = 1;
-    coupleCutoutOpacity = 0;
-    coupleCutoutY = 45;
-    coupleCutoutScale = 0.96;
-    coupleScale = 1.0;
-    doorAngle = 0;
-    doorLightOpacity = 0;
-  } else if (t >= 20.2 && t < 21.8) {
-    // Phase 2a: Couple animates in onto steps (slide-up + fade-in)
-    const prog = (t - 20.2) / 1.6;
+  } else if (t >= 18.5 && t < 20.1) {
+    // Phase 2: Couple animates in FIRST onto steps (slide-up + fade-in)
+    const prog = (t - 18.5) / 1.6;
     const ease = prog < 0.5 ? 2 * prog * prog : 1 - Math.pow(-2 * prog + 2, 2) / 2;
     coupleSceneOpacity = 1;
     backgroundScale = 1.0;
-    coupleElementsOpacity = 1;
     coupleCutoutOpacity = ease;
     coupleCutoutY = 45 * (1 - ease); // 45px -> 0px
     coupleCutoutScale = 0.96 + ease * 0.04; // 0.96 -> 1.0
+    coupleElementsOpacity = 0; // Top date/monogram STILL hidden until couple arrives!
     coupleScale = 1.0;
     doorAngle = 0;
     doorLightOpacity = 0;
-  } else if (t >= 21.4 && t < 23.8) {
-    // Phase 2b: Couple held in full glory with gentle breathing and swaying banana leaves
-    const prog = (t - 21.4) / 2.4;
+  } else if (t >= 20.1 && t < 21.2) {
+    // Phase 3: Couple is fully seated! NOW the top content (monogram + wedding date) animates in
+    const prog = (t - 20.1) / 1.1;
+    const ease = prog < 0.5 ? 2 * prog * prog : 1 - Math.pow(-2 * prog + 2, 2) / 2;
     coupleSceneOpacity = 1;
     backgroundScale = 1.0;
-    coupleElementsOpacity = 1;
+    coupleCutoutOpacity = 1;
+    coupleCutoutY = 0;
+    coupleCutoutScale = 1.0;
+    coupleElementsOpacity = ease; // Top content fades in and slides down gracefully!
+    coupleScale = 1.0;
+    doorAngle = 0;
+    doorLightOpacity = 0;
+  } else if (t >= 21.2 && t < 23.8) {
+    // Phase 4: Couple and top content held in full glory with gentle breathing and swaying banana leaves
+    const prog = (t - 21.2) / 2.6;
+    coupleSceneOpacity = 1;
+    backgroundScale = 1.0;
     coupleCutoutOpacity = 1;
     coupleCutoutY = 0;
     coupleCutoutScale = 1.0 + Math.sin(prog * Math.PI) * 0.012;
+    coupleElementsOpacity = 1;
     coupleScale = 1.0;
     doorAngle = 0;
     doorLightOpacity = 0;
@@ -1057,26 +1059,22 @@ export default function CinematicWeddingMaster({
 
             {/* Top Marriage Date & Monogram Announcement */}
             <div
-              className="absolute inset-x-0 top-7 flex flex-col items-center pointer-events-none px-4 text-center z-25 transition-opacity duration-300"
+              className="absolute inset-x-0 top-7 flex flex-col items-center pointer-events-none px-4 text-center z-25 transition-all duration-500 ease-out"
               style={{
-                opacity: coupleSceneOpacity > 0 ? coupleElementsOpacity : 0,
+                opacity: coupleElementsOpacity,
+                transform: `translateY(${-22 * (1 - coupleElementsOpacity)}px) scale(${0.92 + 0.08 * coupleElementsOpacity})`,
               }}
             >
               {/* Couple Monogram */}
               <div className="w-13 h-13 rounded-full border border-[#E6C687]/70 bg-[#35100B]/85 backdrop-blur-md flex items-center justify-center text-[#F5D98A] shadow-[0_0_30px_rgba(230,198,135,0.45)] mb-2.5">
                 <span className="font-serif font-bold text-base sm:text-lg tracking-wider">
-                  {config?.couple?.monogram || 'S & D'}
+                  {config?.couple?.monogram || 'R & P'}
                 </span>
               </div>
 
               {/* Animated Marriage Date Card */}
               <div
-                className="flex flex-col items-center transition-all duration-1000 ease-out"
-                style={{
-                  opacity: coupleSceneOpacity > 0 ? 1 : 0,
-                  transform: coupleSceneOpacity > 0 ? 'translateY(0px) scale(1)' : 'translateY(-22px) scale(0.9)',
-                  transitionDelay: '350ms',
-                }}
+                className="flex flex-col items-center"
               >
                 {/* Header label */}
                 <div className="flex items-center gap-2 mb-1">
