@@ -96,8 +96,7 @@ export default function CinematicWeddingMaster({
   })();
 
   const [currentTime, setCurrentTime] = useState(isSkipOrDetails ? 25.5 : 0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [hasStarted, setHasStarted] = useState(isSkipOrDetails);
+  const [isPlaying, setIsPlaying] = useState(!isSkipOrDetails);
   const [isMuted, setIsMuted] = useState(false);
   const [isAudioActive, setIsAudioActive] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -135,20 +134,6 @@ export default function CinematicWeddingMaster({
     };
   }, [isPlaying]);
 
-  // Handle start experience with sound
-  const handleStartWithAudio = () => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.muted = false;
-      audio.play().then(() => {
-        setIsAudioActive(true);
-      }).catch(() => {});
-    }
-    setIsMuted(false);
-    setIsPlaying(true);
-    setHasStarted(true);
-  };
-
   // Automatic Audio Lifecycle & Global User Gesture Unlock
   useEffect(() => {
     const audio = audioRef.current;
@@ -156,34 +141,26 @@ export default function CinematicWeddingMaster({
 
     audio.muted = false;
 
-    // 1. Attempt immediate autoplay on mount
+    // 1. Attempt immediate unmuted autoplay on mount
     audio.play().then(() => {
       setIsMuted(false);
       setIsAudioActive(true);
-      setIsPlaying(true);
-      setHasStarted(true);
     }).catch(() => {
-      // Browser autoplay policy requires user interaction before audio starts
+      // If browser defers audio, it will play upon first touch or click
       setIsAudioActive(false);
     });
 
-    // 2. Global interaction handler: start audio + film on ANY user gesture anywhere on screen
+    // 2. Global interaction handler: play audio automatically on first touch or click anywhere
     const handleGesture = () => {
-      if (audio && !isMuted) {
+      if (audio && !isMuted && audio.paused) {
         audio.muted = false;
-        if (audio.paused) {
-          audio.play().then(() => {
-            setIsAudioActive(true);
-          }).catch(() => {});
-        } else {
+        audio.play().then(() => {
           setIsAudioActive(true);
-        }
+        }).catch(() => {});
       }
-      setIsPlaying(true);
-      setHasStarted(true);
     };
 
-    const events = ['click', 'touchstart', 'touchend', 'pointerdown', 'keydown'];
+    const events = ['click', 'touchstart', 'touchend', 'pointerdown'];
     events.forEach((evt) => {
       window.addEventListener(evt, handleGesture, { passive: true, capture: true });
     });
@@ -231,7 +208,6 @@ export default function CinematicWeddingMaster({
   const handleReplay = () => {
     setCurrentTime(0);
     setIsPlaying(true);
-    setHasStarted(true);
     setIsMuted(false);
     const audio = audioRef.current;
     if (audio) {
@@ -576,7 +552,13 @@ export default function CinematicWeddingMaster({
 
   return (
     <div
-      onClick={handleStartWithAudio}
+      onClick={() => {
+        const audio = audioRef.current;
+        if (audio && !isMuted && audio.paused) {
+          audio.muted = false;
+          audio.play().then(() => setIsAudioActive(true)).catch(() => {});
+        }
+      }}
       className="relative min-h-svh w-screen overflow-hidden bg-[#0A0403] text-[#FFF8E7] flex flex-col items-center justify-center font-sans"
     >
       {/* Background Ambient Glow */}
@@ -1138,31 +1120,6 @@ export default function CinematicWeddingMaster({
           </div>
         )}
 
-        {/* Ceremonial Tap to Open Overlay (When initial audio autoplay is deferred by browser) */}
-        {!hasStarted && (
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              handleStartWithAudio();
-            }}
-            className="absolute inset-0 z-45 flex flex-col items-center justify-end pb-12 sm:pb-16 px-6 text-center cursor-pointer pointer-events-auto bg-gradient-to-t from-[#0A1F13]/70 via-transparent to-transparent"
-          >
-            <motion.div
-              animate={{ scale: [1, 1.05, 1], y: [0, -3, 0] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-              className="px-6 py-3 rounded-full bg-gradient-to-r from-[#18462B] via-[#215E39] to-[#18462B] border border-[#F5D98A] text-[#FFF8E7] shadow-[0_10px_35px_rgba(0,0,0,0.65)] flex items-center gap-3 cursor-pointer"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FFEAA7] animate-ping" />
-              <span className="font-serif font-bold text-xs sm:text-sm tracking-[0.2em] uppercase text-[#FFFDF8]">
-                ✦ திருமண அழைப்பிதழ் • Tap to Open ✦
-              </span>
-              <Volume2 className="w-4 h-4 text-[#F5D98A]" />
-            </motion.div>
-            <p className="font-tamil text-xs text-[#13371F] bg-white/75 backdrop-blur-sm px-3.5 py-1 rounded-full drop-shadow mt-2.5 font-bold tracking-wide">
-              இன்னிசையுடன் கூடிய அழைப்பிதழ் • Tap Anywhere to Play with Music
-            </p>
-          </div>
-        )}
 
         {/* Floating Top Controls (Active only during the introductory film) */}
         {t < 24.4 && (
