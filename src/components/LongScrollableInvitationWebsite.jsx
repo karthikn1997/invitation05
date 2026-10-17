@@ -139,7 +139,10 @@ export default function LongScrollableInvitationWebsite({
       {onToggleMute && (
         <button
           type="button"
-          onClick={onToggleMute}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleMute();
+          }}
           aria-label={isMuted ? 'Unmute music' : 'Mute music'}
           className="fixed bottom-6 left-5 z-40 p-3.5 rounded-full bg-[#FFFDF9]/95 hover:bg-[#FFF9E6] backdrop-blur-md border-2 border-[#D4AF37] text-[#7A1C18] shadow-[0_4px_20px_rgba(180,130,20,0.25)] cursor-pointer transition-all hover:scale-110 active:scale-95"
         >

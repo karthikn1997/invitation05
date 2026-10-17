@@ -134,7 +134,7 @@ export default function CinematicWeddingMaster({
     };
   }, [isPlaying]);
 
-  // Automatic Audio Lifecycle & Global User Gesture Unlock
+  // Automatic Audio Lifecycle & Global User Gesture Unlock (Runs once on mount)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -143,34 +143,38 @@ export default function CinematicWeddingMaster({
 
     // 1. Attempt immediate unmuted autoplay on mount
     audio.play().then(() => {
-      setIsMuted(false);
       setIsAudioActive(true);
     }).catch(() => {
       // If browser defers audio, it will play upon first touch or click
       setIsAudioActive(false);
     });
 
-    // 2. Global interaction handler: play audio automatically on first touch or click anywhere
-    const handleGesture = () => {
-      if (audio && !isMuted && audio.paused) {
+    // 2. Global interaction handler: play audio automatically on FIRST touch or click anywhere
+    const handleFirstGesture = () => {
+      if (audio && audio.paused) {
         audio.muted = false;
         audio.play().then(() => {
           setIsAudioActive(true);
         }).catch(() => {});
       }
+      removeListeners();
     };
 
     const events = ['click', 'touchstart', 'touchend', 'pointerdown'];
+    const removeListeners = () => {
+      events.forEach((evt) => {
+        window.removeEventListener(evt, handleFirstGesture, { capture: true });
+      });
+    };
+
     events.forEach((evt) => {
-      window.addEventListener(evt, handleGesture, { passive: true, capture: true });
+      window.addEventListener(evt, handleFirstGesture, { passive: true, capture: true });
     });
 
     return () => {
-      events.forEach((evt) => {
-        window.removeEventListener(evt, handleGesture, { capture: true });
-      });
+      removeListeners();
     };
-  }, [isMuted]);
+  }, []);
 
   // Keep audio in sync with timeline during film playback
   useEffect(() => {
@@ -217,24 +221,25 @@ export default function CinematicWeddingMaster({
     }
   };
 
-  // One-click Mute / Unmute & Play
+  // Robust One-click Mute / Unmute & Play
   const toggleMute = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isMuted) {
-      // Currently muted -> Unmute & Play
-      setIsMuted(false);
-      audio.muted = false;
-      audio.play().then(() => {
-        setIsAudioActive(true);
-      }).catch(() => {});
-    } else {
-      // Currently playing/unmuted -> Mute & Pause
-      setIsMuted(true);
-      audio.muted = true;
-      audio.pause();
-    }
+    setIsMuted((prevMuted) => {
+      const nextMuted = !prevMuted;
+      if (nextMuted) {
+        audio.muted = true;
+        audio.pause();
+        setIsAudioActive(false);
+      } else {
+        audio.muted = false;
+        audio.play().then(() => {
+          setIsAudioActive(true);
+        }).catch(() => {});
+      }
+      return nextMuted;
+    });
   };
 
   const handleScrub = (e) => {
@@ -552,13 +557,6 @@ export default function CinematicWeddingMaster({
 
   return (
     <div
-      onClick={() => {
-        const audio = audioRef.current;
-        if (audio && !isMuted && audio.paused) {
-          audio.muted = false;
-          audio.play().then(() => setIsAudioActive(true)).catch(() => {});
-        }
-      }}
       className="relative min-h-svh w-screen overflow-hidden bg-[#0A0403] text-[#FFF8E7] flex flex-col items-center justify-center font-sans"
     >
       {/* Background Ambient Glow */}
