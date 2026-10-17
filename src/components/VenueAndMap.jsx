@@ -81,9 +81,29 @@ export default function VenueAndMap() {
             </p>
           </div>
 
+          {/* Grand Mandapam Exterior Photo Showcase */}
+          <div
+            className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden mb-6 bg-[#FAF6EE] shadow-[0_12px_32px_rgba(180,130,20,0.18)] border-2 border-[#D4AF37] group"
+          >
+            <img
+              src={venue?.photo || '/images/mandapam_venue_photo.jpg'}
+              alt={venue?.name || 'Thirumana Mandapam'}
+              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+              loading="lazy"
+            />
+            {/* Subtle Gradient & Badge */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent pointer-events-none" />
+            <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-10 flex items-center gap-2">
+              <span className="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-[#E6C687]/60 text-[#FFF5DB] font-tamil text-xs font-bold shadow-md flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#E6C687] animate-pulse" />
+                <span>திருமண மண்டபம் முகப்பு • Mandapam Entrance</span>
+              </span>
+            </div>
+          </div>
+
           {/* Embedded Google Map with 24K Gold Filigree Border */}
           <div
-            className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden my-6 bg-[#FAF6EE]"
+            className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden mb-6 bg-[#FAF6EE]"
             style={{
               border: '2px solid #D4AF37',
               boxShadow: '0 12px 30px rgba(180,130,20,0.15)',

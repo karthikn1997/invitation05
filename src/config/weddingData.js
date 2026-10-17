@@ -82,6 +82,7 @@ export const weddingData = {
     tamilDayEnglish: 'சனிக்கிழமை • Saturday',
   },
   venue: {
+    photo: '/images/mandapam_venue_photo.jpg',
     name: 'Sri Raja Rajeshwari Thirumana Mandapam',
     tamilName: 'ஸ்ரீ ராஜ ராஜேஸ்வரி திருமண மண்டபம்',
     tamilShort: 'ஸ்ரீ ராஜ ராஜேஸ்வரி திருமண மண்டபம், சென்னை',

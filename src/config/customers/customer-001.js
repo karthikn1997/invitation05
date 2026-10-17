@@ -90,6 +90,7 @@ export const customer001 = {
 
   // 6. Auspicious Venue & Location
   venue: {
+    photo: '/images/mandapam_venue_photo.jpg',
     name: 'Sri Murugan Thirumana Mandapam',
     tamilName: 'ஸ்ரீ முருகன் திருமண மண்டபம்',
     addressLine1: 'Vadakkipalayam Pirivu',
