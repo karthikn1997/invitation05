@@ -7,11 +7,10 @@ export const scenesList = [
   { id: 'scene-invitation', number: '01', label: 'The Invitation' },
   { id: 'scene-couple-bond', number: '02', label: 'Couple Story' },
   { id: 'scene-reception-wedding', number: '03', label: 'Reception & Wedding' },
-  { id: 'scene-families', number: '04', label: 'Tamil Patrikai' },
-  { id: 'scene-journey', number: '05', label: 'Event Schedule' },
-  { id: 'scene-countdown', number: '06', label: 'Countdown' },
-  { id: 'scene-venue', number: '07', label: 'Venue & Map' },
-  { id: 'scene-rsvp', number: '08', label: 'RSVP & Wishes' },
+  { id: 'scene-journey', number: '04', label: 'Event Schedule' },
+  { id: 'scene-countdown', number: '05', label: 'Countdown' },
+  { id: 'scene-venue', number: '06', label: 'Venue & Map' },
+  { id: 'scene-rsvp', number: '07', label: 'RSVP & Wishes' },
 ];
 
 export default function NavigationAndShare({

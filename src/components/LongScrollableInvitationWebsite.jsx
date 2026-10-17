@@ -14,7 +14,6 @@ import confetti from 'canvas-confetti';
 import TheInvitation from './TheInvitation';
 import CoupleStory from './CoupleStory';
 import ReceptionAndWedding from './ReceptionAndWedding';
-import TamilPatrikai from './TamilPatrikai';
 import EventSchedule from './EventSchedule';
 import MuhurthamCountdown from './MuhurthamCountdown';
 import VenueAndMap from './VenueAndMap';
@@ -109,10 +108,6 @@ export default function LongScrollableInvitationWebsite({
           <ReceptionAndWedding />
         </section>
 
-        {/* SCENE 04: Traditional Tamil Patrikai with Lineage & Scanned Card Viewer */}
-        <section className="relative w-full">
-          <TamilPatrikai />
-        </section>
 
         {/* SCENE 05: Sacred Wedding Timeline with Illuminated Event Pins */}
         <section className="relative w-full">
