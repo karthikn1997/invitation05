@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-dark: #0E0705;
+    --gold: #E6C687;
+    --gold-bright: #F5D98A;
+    --maroon: #7A1C18;
+    --ivory: #FFF8E7;
+  }
+
+  body {
+    background-color: #0E0705;
+    color: #FFF8E7;
+    font-family: 'Plus Jakarta Sans', 'Noto Sans Tamil', sans-serif;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+/* Luxury Editorial & Tamil Typography Utilities */
+.font-serif {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-display {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+.font-cinzel-decorative {
+  font-family: 'Cinzel Decorative', 'Cinzel', Georgia, serif;
+}
+
+.font-marcellus {
+  font-family: 'Marcellus', Georgia, serif;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-tamil {
+  font-family: 'Noto Serif Tamil', 'Arima Madurai', 'Noto Sans Tamil', serif;
+}
+
+.font-traditional {
+  font-family: 'Noto Serif Tamil', 'Arima Madurai', serif;
+}
+
+.font-kavivanar {
+  font-family: 'Kavivanar', 'Arima Madurai', cursive;
+}
+
+.font-script {
+  font-family: 'Great Vibes', cursive;
+}
+
+/* Authentic Animations */
+@keyframes gentleSway {
+  0%, 100% {
+    transform: rotate(-1.5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.5deg) translateY(3px);
+  }
+}
+
+.animate-float-sway {
+  transform-origin: top;
+  animation: 7s ease-in-out infinite gentleSway;
+}
+
+@keyframes softPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.03);
+  }
+}
+
+.animate-pulse-glow {
+  animation: 6s ease-in-out infinite softPulse;
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-5px) scale(1.012); }
+}
+
+@keyframes palmSway {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(1.8deg); }
+  70% { transform: rotate(-0.8deg); }
+}
+
+@keyframes leafSway {
+  0%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(2.5deg); }
+  70% { transform: rotate(-1.2deg); }
+}
+
+/* Authentic Banana Tree Wind Sway Animations */
+@keyframes bananaTreeSwayLeft {
+  0% {
+    transform: rotate(0deg) skewX(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(1.6deg) skewX(-0.8deg) scale(1.008);
+  }
+  50% {
+    transform: rotate(-0.7deg) skewX(0.3deg) scale(0.996);
+  }
+  75% {
+    transform: rotate(2.2deg) skewX(-1.0deg) scale(1.012);
+  }
+  100% {
+    transform: rotate(0deg) skewX(0deg) scale(1);
+  }
+}
+
+@keyframes bananaTreeSwayRight {
+  0% {
+    transform: rotate(0deg) skewY(0deg) scale(1);
+  }
+  30% {
+    transform: rotate(-1.8deg) skewY(0.6deg) scale(1.006);
+  }
+  65% {
+    transform: rotate(1.0deg) skewY(-0.4deg) scale(0.995);
+  }
+  100% {
+    transform: rotate(0deg) skewY(0deg) scale(1);
+  }
+}
+
+.animate-banana-sway-left {
+  transform-origin: 0% 65%;
+  animation: bananaTreeSwayLeft 6.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-banana-sway-right {
+  transform-origin: 95% 35%;
+  animation: bananaTreeSwayRight 5.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Accessible focus styling */
+button:focus-visible, a:focus-visible {
+  outline: 2px solid #E6C687;
+  outline-offset: 3px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0E0705;
+}
+::-webkit-scrollbar-thumb {
+  background: #7A1C18;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #E6C687;
+}
+
+/* Dedicated luxury invitation details scroll */
+.invitation-details-scroll {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #E6C687 rgba(26, 8, 5, 0.7);
+}
+
+.invitation-details-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.invitation-details-scroll::-webkit-scrollbar-track {
+  background: rgba(20, 6, 4, 0.85);
+  border-radius: 9999px;
+}
+
+.invitation-details-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #DDA74A 0%, #F5D98A 50%, #C99738 100%);
+  border-radius: 9999px;
+  box-shadow: 0 0 6px rgba(245, 217, 138, 0.5);
+}
+
+.invitation-details-scroll::-webkit-scrollbar-thumb:hover {
+  background: #FFEAA7;
+}
+
+/* Luxury Royal Gold Foil & Silk Utilities */
+.text-gold-foil {
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 14px rgba(227, 178, 79, 0.4));
+  background: linear-gradient(135deg, #FFFDEB 0%, #FBE3A1 30%, #E3B24F 65%, #AE7A26 100%);
+  -webkit-background-clip: text;
+}
+
+.text-gold-radiant {
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95));
+  background: linear-gradient(180deg, #FFFFFF 0%, #F7E4B2 45%, #D9A445 100%);
+  -webkit-background-clip: text;
+}
+
+.bg-champagne-silk {
+  background: linear-gradient(180deg, #FAF4E8 0%, #F4E7CE 50%, #FAF4E8 100%);
+}
+
+.mask-temple-arch {
+  border-radius: 9999px 9999px 2rem 2rem;
+}
+
+.mask-oval-heirloom {
+  border-radius: 9999px;
+}
+
+.photo-paper-blend {
+  box-shadow: 0 20px 55px rgba(90, 16, 21, 0.2), 0 0 0 1px rgba(182, 137, 76, 0.45), 0 0 0 6px rgba(250, 244, 232, 0.85), 0 0 0 7px rgba(182, 137, 76, 0.3);
+}
+
