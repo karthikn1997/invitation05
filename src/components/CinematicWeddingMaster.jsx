@@ -1181,10 +1181,6 @@ export default function CinematicWeddingMaster({
                   ✦
                 </span>
               </motion.button>
-
-              <p className="font-tamil text-xs text-[#FFF6DF] font-semibold mt-2.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] tracking-wide">
-                அழைப்பிதழைத் திறக்க தொடவும்
-              </p>
             </motion.div>
           )}
         </AnimatePresence>
