@@ -96,7 +96,8 @@ export default function CinematicWeddingMaster({
   })();
 
   const [currentTime, setCurrentTime] = useState(isSkipOrDetails ? 25.5 : 0);
-  const [isPlaying, setIsPlaying] = useState(!isSkipOrDetails);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isOpened, setIsOpened] = useState(isSkipOrDetails);
   const [isMuted, setIsMuted] = useState(false);
   const [isAudioActive, setIsAudioActive] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -105,6 +106,21 @@ export default function CinematicWeddingMaster({
   const animFrameRef = useRef(null);
   const lastTimeRef = useRef(performance.now());
   const scrollContainerRef = useRef(null);
+
+  // Ceremonial Open Invitation Handler: User tap unlocks audio and begins film with sound
+  const handleOpenInvitation = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.muted = false;
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        setIsAudioActive(true);
+      }).catch(() => {});
+    }
+    setIsMuted(false);
+    setIsPlaying(true);
+    setIsOpened(true);
+  };
 
   // Master Continuous Animation Clock (RequestAnimationFrame)
   useEffect(() => {
@@ -212,6 +228,7 @@ export default function CinematicWeddingMaster({
   const handleReplay = () => {
     setCurrentTime(0);
     setIsPlaying(true);
+    setIsOpened(true);
     setIsMuted(false);
     const audio = audioRef.current;
     if (audio) {
@@ -1118,6 +1135,59 @@ export default function CinematicWeddingMaster({
           </div>
         )}
 
+        {/* ======================================================================= */}
+        {/* CEREMONIAL "OPEN INVITATION" ROYAL BUTTON (Active on initial cover) */}
+        {/* ======================================================================= */}
+        <AnimatePresence>
+          {!isOpened && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.35 } }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="absolute inset-x-0 bottom-10 sm:bottom-14 z-40 flex flex-col items-center text-center px-4 pointer-events-auto"
+            >
+              <motion.button
+                type="button"
+                onClick={handleOpenInvitation}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  y: [0, -4, 0],
+                  boxShadow: [
+                    '0 10px 30px rgba(0,0,0,0.85), 0 0 15px rgba(230,198,135,0.3)',
+                    '0 14px 40px rgba(0,0,0,0.9), 0 0 30px rgba(230,198,135,0.6)',
+                    '0 10px 30px rgba(0,0,0,0.85), 0 0 15px rgba(230,198,135,0.3)',
+                  ],
+                }}
+                transition={{
+                  y: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' },
+                  boxShadow: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' },
+                }}
+                className="group relative px-8 py-3.5 sm:px-10 sm:py-4 rounded-full bg-gradient-to-r from-[#6A1512] via-[#8B1E19] to-[#5C110F] text-[#FFF8E7] border-2 border-[#E6C687] flex items-center justify-center gap-2.5 cursor-pointer overflow-hidden backdrop-blur-md"
+              >
+                {/* Shimmer Light Sweep */}
+                <motion.div
+                  animate={{ x: ['-130%', '240%'] }}
+                  transition={{ duration: 3.0, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' }}
+                  className="pointer-events-none absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/35 to-transparent skew-x-12"
+                />
+
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FFEAA7] animate-ping" />
+                <span className="font-serif font-bold text-xs sm:text-sm tracking-[0.24em] uppercase text-[#FFF8E7] drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+                  OPEN INVITATION
+                </span>
+                <span className="text-[#F5D98A] text-sm group-hover:translate-x-1 transition-transform">
+                  ✦
+                </span>
+              </motion.button>
+
+              <p className="font-tamil text-xs text-[#FFF6DF] font-semibold mt-2.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] tracking-wide">
+                அழைப்பிதழைத் திறக்க தொடவும்
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Floating Top Controls (Active only during the introductory film) */}
         {t < 24.4 && (
