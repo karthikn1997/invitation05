@@ -16,7 +16,7 @@ import {
  * - 6-part continuous cinematic sequence (Temple -> Bride -> Groom -> Couple -> Corridor -> Details)
  * - Multi-customer configuration with in-app editor and local photo upload
  * - Genuine MP4 video export workflow
- */ 
+ */
 export default function App() {
   const [activeCustomerId, setActiveCustomerId] = useState(() => {
     if (typeof window !== 'undefined') {
